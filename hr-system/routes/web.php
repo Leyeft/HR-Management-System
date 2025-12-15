@@ -96,3 +96,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('employees', EmployeeController::class);
 });
 
+Route::get('/head/leave-history', [LeaveApprovalController::class, 'history'])
+    ->name('head.leave.history')
+    ->middleware('auth');

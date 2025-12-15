@@ -32,6 +32,16 @@
                             <x-nav-link :href="route('leave.approvals')" :active="request()->routeIs('leave.approvals')">
                         Leave Approvals
                      </x-nav-link>
+                     @if (auth()->user()->employee?->rank === 'head')
+                        <x-nav-link :href="route('leave.approvals')" :active="request()->routeIs('leave.approvals')">
+                            Pending Leaves
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('head.leave.history')" :active="request()->routeIs('head.leave.history')">
+                            Leave History
+                        </x-nav-link>
+                    @endif
+
 
 
                 </div>
@@ -101,12 +111,22 @@
             {{ __('Employees') }}
         </x-responsive-nav-link>
         <x-responsive-nav-link :href="route('leave.index')" :active="request()->routeIs('leave.*')">
-    Leave Requests
+            Leave Requests
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('leave.approvals')" :active="request()->routeIs('leave.approvals')">
+            Leave Approvals
+        </x-responsive-nav-link>
+    @if (auth()->user()->employee?->rank === 'head')
+        <x-responsive-nav-link :href="route('leave.approvals')" :active="request()->routeIs('leave.approvals')">
+            Pending Leaves
         </x-responsive-nav-link>
 
-        <x-responsive-nav-link :href="route('leave.approvals')" :active="request()->routeIs('leave.approvals')">
-    Leave Approvals
-</x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('head.leave.history')" :active="request()->routeIs('head.leave.history')">
+            Leave History
+        </x-responsive-nav-link>
+    @endif
+
 
 
 

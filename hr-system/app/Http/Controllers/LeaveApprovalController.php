@@ -66,5 +66,21 @@ class LeaveApprovalController extends Controller
             abort(403);
         }
     }
+    public function history()
+{
+    $employee = auth()->user()->employee;
+
+    if ($employee->rank !== 'head') {
+        abort(403);
+    }
+
+    $leaves = LeaveRequest::where('department_id', $employee->department_id)
+        ->with(['employee.user'])
+        ->latest()
+        ->paginate(10);
+
+    return view('leave-approvals.history', compact('leaves'));
+}
+
 }
 
