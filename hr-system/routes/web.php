@@ -1,13 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\LeaveRequestController;
-use App\Http\Controllers\LeaveApprovalController;
-use App\Http\Controllers\HRLeaveController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\{
+    ProfileController,
+    DepartmentController,
+    EmployeeController,
+    LeaveRequestController,
+    LeaveApprovalController,
+    HRLeaveController,
+    DashboardController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -15,17 +17,15 @@ use App\Http\Controllers\DashboardController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard
+| Auth Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -34,18 +34,28 @@ Route::get('/dashboard', function () {
 */
 Route::middleware(['auth'])->group(function () {
 
-    // Profile
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Departments
-    Route::resource('departments', DepartmentController::class);
-
-    // Employees
-    Route::resource('employees', EmployeeController::class);
-
-    // Leave requests (Employee)
+    /*
+    |--------------------------------------------------------------------------
+    | Employee Leave (ALL USERS CAN VIEW THEIR OWN)
+    |--------------------------------------------------------------------------
+    */
     Route::get('/leave-requests', [LeaveRequestController::class, 'index'])
         ->name('leave.index');
 
@@ -55,7 +65,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leave-requests', [LeaveRequestController::class, 'store'])
         ->name('leave.store');
 
-    // Leave approvals (Head)
+    /*
+    |--------------------------------------------------------------------------
+    | Head of Department (Approve / Reject)
+    |--------------------------------------------------------------------------
+    */
     Route::get('/leave-approvals', [LeaveApprovalController::class, 'index'])
         ->name('leave.approvals');
 
@@ -65,13 +79,20 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leave-approvals/{leave}/reject', [LeaveApprovalController::class, 'reject'])
         ->name('leave.reject');
 
-    // HR leave view (READ ONLY)
+    /*
+    |--------------------------------------------------------------------------
+    | HR (READ ONLY)
+    |--------------------------------------------------------------------------
+    */
     Route::get('/hr/leave-requests', [HRLeaveController::class, 'index'])
         ->name('hr.leave.index');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin (Manage System)
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('departments', DepartmentController::class);
+    Route::resource('employees', EmployeeController::class);
 });
 
-require __DIR__ . '/auth.php';
-
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
-    ->name('dashboard');

@@ -51,5 +51,20 @@ class User extends Authenticatable
 {
     return $this->hasOne(Employee::class);
 }
+public function isAdmin(): bool
+{
+    return $this->role === 'admin';
+}
+
+public function isHR(): bool
+{
+    return $this->role === 'hr';
+}
+
+public function isEmployee(): bool
+{
+    return $this->role === 'employee';
+}
+
 
 }
