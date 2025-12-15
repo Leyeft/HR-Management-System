@@ -24,3 +24,9 @@ use App\Http\Controllers\DepartmentController;
 Route::middleware(['auth'])->group(function () {
     Route::resource('departments', DepartmentController::class);
 });
+
+use App\Http\Controllers\EmployeeController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('employees', EmployeeController::class);
+});
