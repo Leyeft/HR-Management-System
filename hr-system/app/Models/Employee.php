@@ -32,7 +32,8 @@ class Employee extends Model
     return match ($this->rank) {
         'employee' => 'Employee',
         'head' => 'Head of Department',
-        'manager' => 'Manager',
+        'admin' => 'Admin',
+        'hr' => 'HR',
         default => ucfirst($this->rank),
     };
 }

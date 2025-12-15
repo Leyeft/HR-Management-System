@@ -13,7 +13,7 @@ class LeaveRequest extends Model
         'end_date',
         'reason',
         'status',
-        'rejection_reason',
+        'reject_reason',
     ];
 
     public function employee()

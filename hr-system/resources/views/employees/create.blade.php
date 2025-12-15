@@ -5,22 +5,35 @@
         <form method="POST" action="{{ route('employees.store') }}" class="space-y-4">
             @csrf
 
-            <input name="name" placeholder="Full Name" class="w-full border rounded p-2">
+            <input name="name" placeholder="Full Name"
+                   class="w-full border rounded p-2" required>
 
-            <input name="email" type="email" placeholder="Email" class="w-full border rounded p-2">
+            <input name="email" type="email" placeholder="Email"
+                   class="w-full border rounded p-2" required>
 
-            <input name="password" type="password" placeholder="Password" class="w-full border rounded p-2">
+            <input name="password" type="password" placeholder="Password"
+                   class="w-full border rounded p-2" required>
 
-            <input name="date_of_birth" type="date" class="w-full border rounded p-2">
+            <input name="date_of_birth" type="date"
+                   class="w-full border rounded p-2" required>
 
-            <select name="department_id" class="w-full border rounded p-2">
+            {{-- System Role --}}
+            <select name="role" class="w-full border rounded p-2" required>
+                <option value="employee">Employee</option>
+                <option value="hr">HR</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            {{-- Department --}}
+            <select name="department_id" class="w-full border rounded p-2" required>
                 <option value="">Select Department</option>
                 @foreach ($departments as $department)
                     <option value="{{ $department->id }}">{{ $department->name }}</option>
                 @endforeach
             </select>
 
-            <select name="rank" class="w-full border rounded p-2">
+            {{-- Department Rank --}}
+            <select name="rank" class="w-full border rounded p-2" required>
                 <option value="employee">Employee</option>
                 <option value="head">Head of Department</option>
             </select>

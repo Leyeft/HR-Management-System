@@ -62,34 +62,50 @@ class EmployeeController extends Controller
      * STORE
      * ======================= */
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'department_id' => 'required|exists:departments,id',
-            'rank' => 'required|in:employee,head',
-            'date_of_birth' => 'required|date',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6',
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'employee',
-        ]);
+        // system access
+        'role' => 'required|in:employee,hr,admin',
 
-        Employee::create([
-            'user_id' => $user->id,
-            'department_id' => $request->department_id,
-            'rank' => $request->rank,
-            'date_of_birth' => $request->date_of_birth,
-        ]);
+        // department hierarchy
+        'rank' => 'required|in:employee,head',
 
-        return redirect()
-            ->route('employees.index')
-            ->with('success', 'Employee created successfully');
+        'department_id' => 'required|exists:departments,id',
+        'date_of_birth' => 'required|date',
+    ]);
+
+    // ❌ Block invalid combinations
+    if ($request->role !== 'employee' && $request->rank === 'head') {
+        return back()->withErrors([
+            'rank' => 'Only employees can be Head of Department.',
+        ])->withInput();
     }
+
+    // Create user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role, // ✅ FIXED
+    ]);
+
+    // Create employee
+    Employee::create([
+        'user_id' => $user->id,
+        'department_id' => $request->department_id,
+        'rank' => $request->rank,
+        'date_of_birth' => $request->date_of_birth,
+    ]);
+
+    return redirect()
+        ->route('employees.index')
+        ->with('success', 'Employee created successfully');
+}
+
 
     /* =======================
      * EDIT
@@ -111,7 +127,7 @@ class EmployeeController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $employee->user_id,
             'department_id' => 'required|exists:departments,id',
-            'rank' => 'required|in:employee,head',
+            'rank' => 'required|in:employee,head,admin,hr',
             'date_of_birth' => 'required|date',
         ]);
 
