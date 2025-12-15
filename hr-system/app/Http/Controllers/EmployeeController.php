@@ -13,43 +13,41 @@ class EmployeeController extends Controller
     /* =======================
      * INDEX
      * ======================= */
-    public function index(Request $request)
+  public function index(Request $request)
 {
-    $employees = Employee::with(['user', 'department'])
-    ->whereHas('user') // ensures join exists
-    ->join('users', 'employees.user_id', '=', 'users.id')
+    $sort = $request->get('sort', 'asc');
 
-    // SEARCH
-    ->when($request->search, function ($query) use ($request) {
-        $query->where(function ($q) use ($request) {
-            $q->where('users.name', 'like', '%' . $request->search . '%')
-              ->orWhere('users.email', 'like', '%' . $request->search . '%');
-        });
-    })
+    $employees = Employee::join('users', 'employees.user_id', '=', 'users.id')
+        ->with(['user', 'department'])
 
-    // FILTER: department
-    ->when($request->department, function ($query) use ($request) {
-        $query->where('employees.department_id', $request->department);
-    })
+        // Search
+        ->when($request->search, function ($query) use ($request) {
+            $query->where(function ($q) use ($request) {
+                $q->where('users.name', 'like', '%' . $request->search . '%')
+                  ->orWhere('users.email', 'like', '%' . $request->search . '%');
+            });
+        })
 
-    // FILTER: rank
-    ->when($request->rank, function ($query) use ($request) {
-        $query->where('employees.rank', $request->rank);
-    })
+        // Department filter
+        ->when($request->department !== null && $request->department !== '', function ($q) use ($request) {
+            $q->where('employees.department_id', $request->department);
+        })
 
-    // ✅ ALPHABETICAL ORDER
-    ->orderBy('users.name', 'asc')
+        // Rank filter
+        ->when($request->rank !== null && $request->rank !== '', function ($q) use ($request) {
+            $q->where('employees.rank', $request->rank);
+        })
 
-    // IMPORTANT: avoid column conflict
-    ->select('employees.*')
-
-    ->paginate(10)
-    ->withQueryString();
+        ->orderBy('users.name', $sort)
+        ->select('employees.*')
+        ->paginate(10)
+        ->withQueryString();
 
     $departments = Department::all();
 
     return view('employees.index', compact('employees', 'departments'));
 }
+
 
     /* =======================
      * CREATE

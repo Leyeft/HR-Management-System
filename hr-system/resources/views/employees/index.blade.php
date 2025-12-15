@@ -4,24 +4,26 @@
             Employees
         </h2>
     </x-slot>
-    <form method="GET" class="mt-4 mb-2 grid grid-cols-1 md:grid-cols-4 gap-4">
+<form method="GET"
+      class="mt-4 mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
-
-
-    {{-- Search by name or email --}}
-    <div>
+    {{-- LEFT: Search --}}
+    <div class="w-full md:w-1/3 md:ml-6">
         <input
             type="text"
             name="search"
             value="{{ request('search') }}"
             placeholder="Search name or email..."
-            class="w-full border-gray-300 rounded-md shadow-sm"
+            class="w-full border-gray-300 rounded-md shadow-sm text-sm py-2"
         >
     </div>
 
-    {{-- Department filter --}}
-    <div>
-        <select name="department" class="w-full border-gray-300 rounded-md shadow-sm">
+    {{-- RIGHT: Filters --}}
+    <div class="flex items-center gap-2">
+
+        {{-- Department --}}
+        <select name="department"
+                class="border-gray-300 rounded-md shadow-sm text-sm py-2">
             <option value="">All Departments</option>
             @foreach ($departments as $department)
                 <option value="{{ $department->id }}"
@@ -30,11 +32,10 @@
                 </option>
             @endforeach
         </select>
-    </div>
 
-    {{-- Rank filter --}}
-    <div>
-        <select name="rank" class="w-full border-gray-300 rounded-md shadow-sm">
+        {{-- Rank --}}
+        <select name="rank"
+                class="border-gray-300 rounded-md shadow-sm text-sm py-2">
             <option value="">All Ranks</option>
             <option value="employee" {{ request('rank') === 'employee' ? 'selected' : '' }}>
                 Employee
@@ -43,15 +44,21 @@
                 Head
             </option>
         </select>
-    </div>
 
-    {{-- Submit --}}
-    <div>
-        <button class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">
-            Filter
+        {{-- Sort toggle --}}
+        <button type="submit"
+                name="sort"
+                value="{{ request('sort') === 'asc' ? 'desc' : 'asc' }}"
+                class="border border-gray-300 rounded-md px-3 py-2 text-sm hover:bg-gray-100">
+            {{ request('sort') === 'asc' ? 'Z–A' : 'A–Z' }}
+        </button>
+
+        {{-- Apply --}}
+        <button type="submit"
+                class="bg-indigo-600 text-white px-3 py-2 rounded-md text-sm hover:bg-indigo-700">
+            Apply
         </button>
     </div>
-
 </form>
 
     <div class="py-12">
@@ -153,6 +160,10 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                {{-- Pagination --}}
+                <div class="mt-4">
+                    {{ $employees->links() }}
                 </div>
 
             </div>
